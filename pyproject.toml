@@ -1,0 +1,32 @@
+[project]
+authors = [
+  { name = "Caden Atack", email = "cadenthomas4@gmail.com" }
+]
+name = "practice-data-sets"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pandas",
+    "numpy",
+]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+# Homepage is the same as the repository URL
+"Homepage" = "https://github.com/Ctack14/practice-data-sets"
+
+# This is currently empty
+# "Issues" = "https://github.com/Ctack14/practice-data-sets/issues"
+
+# Install with `pip install .[dev]` to get the dev dependencies
+[tool.uv.dependencies]
+dev = [
+    "pytest",
+    "black",
+    "ruff"
+]

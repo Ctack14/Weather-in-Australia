@@ -1,3 +1,14 @@
+Metadata-Version: 2.4
+Name: practice-data-sets
+Version: 0.1.0
+Summary: Add your description here
+Author-email: Caden Atack <cadenthomas4@gmail.com>
+Project-URL: Homepage, https://github.com/Ctack14/practice-data-sets
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: numpy
+
 # Australian Weather Data Analysis
 
 ---
