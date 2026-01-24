@@ -7,7 +7,7 @@ def describe_weather_data(df: pd.DataFrame) -> None:
     Args:
         df (pd.DataFrame): DataFrame containing the weather data.
 
-    Returns:
+    Returns: -
         None
     """
     print("Weather Data Overview:")

@@ -2,11 +2,11 @@
 authors = [
   { name = "Caden Atack", email = "cadenthomas4@gmail.com" }
 ]
-name = "practice-data-sets"
-version = "0.1.0"
-description = "Add your description here"
+name = "Ctack14-practice-data-sets"
+version = "0.1.20"
+description = "Australian weather data used to learn and practice data analysis skills."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "pandas",
     "numpy",
@@ -15,6 +15,12 @@ dependencies = [
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+"practice_data_sets" = ["data/*.csv"]
 
 [project.urls]
 # Homepage is the same as the repository URL
