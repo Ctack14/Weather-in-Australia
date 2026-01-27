@@ -3,7 +3,7 @@
 ---
 This project loads daily Australian weather data over 10 years
 and stores it in a pandas DataFrame. It's likely that this 
-project will expand to perform data analysis.
+project will expand to perform more advanced data analysis.
 
 ## Dataset
 - Title: Australia Weather Data
@@ -34,21 +34,19 @@ pip install Ctack14-practice-data-sets[dev]
 
 ## Steps
 
-For module 2, I broke the project into modules and created a package. This included using a pyproject.toml file for configuration.
-I also took the functions previously in main.py and moved them into their own module files within the package. 
-main.py is now just an example usage script to run the package once installed. 
-I then generated new documentation with:
-- `pydoc -w practice_data_sets`
-- `pydoc -w main`
+For module 3, I restructured the project to use OOP principles while still maintaining the ability to be packaged and uploaded to PyPI.
 
-__init__.py files were added to each package folder to make them recognizable as packages.
+- `DataLoader` class to handle loading and preprocessing the weather data.
+- `DataProcessor` class to perform analysis on the loaded data. Description now returns basic statistics rather than displaying them. They can be displayed in the application logic.
+- `app.py` to serve as the main entry point for running the application and composes the objects.
 
-Uploading the package was done using twine. After creating my API key on PyPI, it was very straightforward to upload.
+ ---
 
- --- 
-For testing, I created a new empty directory, and created a new virtual environment inside it. I then ran:
-```bash
-pip install Ctack14-practice-data-sets
-```
-to install the package from pyPI.
-I then created a new test script importing the package and running the main function to ensure everything worked as expected.
+The init file for the package was updated to reflect the new structure.
+
+### OOP Principles Applied
+- Encapsulated data and behavior inside of classes.
+- Used methods to operate on the data within the classes.
+- Separated concerns by creating distinct classes for loading and processing data.
+- Created an application class to manage the workflow. This replaces the old `main.py` script.
+

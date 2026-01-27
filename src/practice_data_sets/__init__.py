@@ -1,4 +1,4 @@
-from .loader import load_weather_data
-from .stats import describe_weather_data
+from .loader import DataLoader
+from .stats import DataProcessor
 
-__all__ = ["load_weather_data", "describe_weather_data"]
+__all__ = ["DataLoader", "DataProcessor"]

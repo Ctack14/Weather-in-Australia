@@ -3,7 +3,7 @@ authors = [
   { name = "Caden Atack", email = "cadenthomas4@gmail.com" }
 ]
 name = "Ctack14-practice-data-sets"
-version = "0.1.20"
+version = "0.1.21"
 description = "Australian weather data used to learn and practice data analysis skills."
 readme = "README.md"
 requires-python = ">=3.10"
