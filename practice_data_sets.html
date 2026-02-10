@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: package practice_data_sets</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">practice_data_sets</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/cadenatack/PycharmProjects/CS%203270/Practice-Data-sets/src/practice_data_sets/__init__.py">/Users/cadenatack/PycharmProjects/CS 3270/Practice-Data-sets/src/practice_data_sets/__init__.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Package Contents</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="practice_data_sets.app.html">app</a><br>
+</td><td class="multicolumn"><a href="practice_data_sets.data.html"><strong>data</strong>&nbsp;(package)</a><br>
+</td><td class="multicolumn"><a href="practice_data_sets.loader.html">loader</a><br>
+</td><td class="multicolumn"><a href="practice_data_sets.stats.html">stats</a><br>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="practice_data_sets.loader.html#DataLoader">practice_data_sets.loader.DataLoader</a>
+</dt><dt class="heading-text"><a href="practice_data_sets.stats.html#DataProcessor">practice_data_sets.stats.DataProcessor</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="DataLoader">class <strong>DataLoader</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#DataLoader">DataLoader</a>(filename:&nbsp;str)<br>
+&nbsp;<br>
+Retrieves&nbsp;data&nbsp;from&nbsp;csv&nbsp;files<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="DataLoader-__init__"><strong>__init__</strong></a>(self, filename: str)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="DataLoader-load_data"><strong>load_data</strong></a>(self) -&gt; pandas.core.frame.DataFrame</dt><dd><span class="code">Loads&nbsp;weather&nbsp;data&nbsp;from&nbsp;a&nbsp;csv&nbsp;file&nbsp;into&nbsp;a&nbsp;pandas&nbsp;DataFrame.<br>
+Uses&nbsp;importlib.resources&nbsp;to&nbsp;access&nbsp;the&nbsp;data&nbsp;file,&nbsp;which&nbsp;will&nbsp;work&nbsp;both&nbsp;in&nbsp;development&nbsp;and&nbsp;when&nbsp;packaged<br>
+across&nbsp;different&nbsp;environments.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;None<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pd.DataFrame:&nbsp;DataFrame&nbsp;containing&nbsp;the&nbsp;weather&nbsp;data.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="DataProcessor">class <strong>DataProcessor</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#DataProcessor">DataProcessor</a>(df:&nbsp;pandas.core.frame.DataFrame)<br>
+&nbsp;<br>
+Processes&nbsp;weather&nbsp;data<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="DataProcessor-__init__"><strong>__init__</strong></a>(self, df: pandas.core.frame.DataFrame)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="DataProcessor-describe_weather_data"><strong>describe_weather_data</strong></a>(self) -&gt; dict[str, pandas.core.frame.DataFrame]</dt><dd><span class="code">Displays&nbsp;weather&nbsp;information&nbsp;from&nbsp;the&nbsp;DataFrame.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df&nbsp;(pd.DataFrame):&nbsp;DataFrame&nbsp;containing&nbsp;the&nbsp;weather&nbsp;data.<br>
+&nbsp;<br>
+Returns:&nbsp;-<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Head&nbsp;and&nbsp;description&nbsp;of&nbsp;the&nbsp;DataFrame.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>__all__</strong> = ['DataLoader', 'DataProcessor']</td></tr></table>
+</body></html>

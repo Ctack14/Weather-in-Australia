@@ -27,7 +27,7 @@ class DataLoader:
                 for line in data_path:
                     yield line.strip().split(",")
         except FileNotFoundError:
-            logger.error(f"File {self.filename} not found.")
+            logger.error(f"File | {self.filename} | was not found.")
             raise
         except Exception as e:
             logger.error(f"An error occurred while reading the file: {e}")

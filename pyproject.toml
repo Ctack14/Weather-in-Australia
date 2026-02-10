@@ -30,9 +30,10 @@ package-dir = {"" = "src"}
 # "Issues" = "https://github.com/Ctack14/practice-data-sets/issues"
 
 # Install with `pip install .[dev]` to get the dev dependencies
-[tool.uv.dependencies]
+[project.optional-dependencies]
 dev = [
     "pytest",
+    "pytest-cov",
     "black",
     "ruff"
 ]

@@ -28,23 +28,18 @@ pip install Ctack14-practice-data-sets
 ---
 To Install as a developer:
 ```bash
-pip install Ctack14-practice-data-sets[dev]
+pip install -e ".[dev]" 
 ```
 
 
 ## Steps
 
-For module 4, I changed the loader.py file to include a generator function to go through the data one row at a time. 
-There is also some error handling using the logger library to log any issues that arise during loading. In both the
-loader.py and stats.py files, I also used the logger.info() method to log the progress of the loading and processing steps.
-Simple configuration of the logger in app.py allows these changes to be reflected in the console output when running the application.
- ---
+For module 5, I added unit tests. I have two modules I wanted to test, "loader.py" and "stats.py". I created a new tests
+directory to put my tests into, complete with an __init__.py file to make it a package. I then created two test files, 
+one for each module. In these files, I wrote unit tests to check the functionality of the methods in the loader and 
+stats modules. I used the pytest framework, using the pytest--cov plugin to check the code coverage of my tests. 
+I ran the tests to ensure that they were working correctly and that all important code was covered.
+
+---
 
 The init file for the package was updated to reflect the new structure.
-
-### OOP Principles Applied
-- Encapsulated data and behavior inside of classes.
-- Used methods to operate on the data within the classes.
-- Separated concerns by creating distinct classes for loading and processing data.
-- Created an application class to manage the workflow. This replaces the old `main.py` script.
-

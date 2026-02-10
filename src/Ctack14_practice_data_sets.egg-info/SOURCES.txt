@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/Ctack14_practice_data_sets.egg-info/PKG-INFO
+src/Ctack14_practice_data_sets.egg-info/SOURCES.txt
+src/Ctack14_practice_data_sets.egg-info/dependency_links.txt
+src/Ctack14_practice_data_sets.egg-info/requires.txt
+src/Ctack14_practice_data_sets.egg-info/top_level.txt
+src/practice_data_sets/__init__.py
+src/practice_data_sets/app.py
+src/practice_data_sets/loader.py
+src/practice_data_sets/stats.py
+src/practice_data_sets/data/Weather Training Data.csv
+src/practice_data_sets/data/__init__.py
+tests/test_loader.py
+tests/test_stats.py
