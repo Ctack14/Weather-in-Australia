@@ -1,8 +1,10 @@
 """An application entry point"""
-
+import logging
 from practice_data_sets.loader import DataLoader
 from practice_data_sets.stats import DataProcessor
 
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 def main():
     """
@@ -10,7 +12,8 @@ def main():
     """
 
     # Load the weather data
-    loader = DataLoader("Weather Training Data.csv")
+    # loader = DataLoader("Weather Training Data.csv")
+    loader = DataLoader("Missing File Test.csv")   # Intentionally using a missing file to demonstrate error handling
     weather_df = loader.load_data()
 
     # Process and describe the weather data

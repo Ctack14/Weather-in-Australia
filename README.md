@@ -34,12 +34,10 @@ pip install Ctack14-practice-data-sets[dev]
 
 ## Steps
 
-For module 3, I restructured the project to use OOP principles while still maintaining the ability to be packaged and uploaded to PyPI.
-
-- `DataLoader` class to handle loading and preprocessing the weather data.
-- `DataProcessor` class to perform analysis on the loaded data. Description now returns basic statistics rather than displaying them. They can be displayed in the application logic.
-- `app.py` to serve as the main entry point for running the application and composes the objects.
-
+For module 4, I changed the loader.py file to include a generator function to go through the data one row at a time. 
+There is also some error handling using the logger library to log any issues that arise during loading. In both the
+loader.py and stats.py files, I also used the logger.info() method to log the progress of the loading and processing steps.
+Simple configuration of the logger in app.py allows these changes to be reflected in the console output when running the application.
  ---
 
 The init file for the package was updated to reflect the new structure.
