@@ -28,23 +28,18 @@ class DataProcessor:
             "description": self.df.describe()
         }
 
-    def print_unique_locations(self):
+    def find_unique_locations(self):
         """
-        Prints the unique locations in the weather data using
+        Finds and returns a list of unique locations from the DataFrame.
 
         Args:
-            df (pd.DataFrame): DataFrame containing the weather data.
+            None
 
-        Returns: None
+        Returns: A list of unique locations in the DataFrame.
         """
 
         logger.info("Printing unique locations")
 
-        for location in self.df["Location"].unique():   # Iterator usage for rubric
-            print(location)
-
-
-
-
+        return list(self.df["Location"].unique())
 
 

@@ -26,13 +26,13 @@ def test_describe_weather_data():
     assert not results["head"].empty
     assert not results["description"].empty
 
-def test_print_unique_locations(capsys):
+def test_find_unique_locations(capsys):
     """Tests the usage of an iterator to print unique locations."""
     df = sample_dataframe()
     processor = DataProcessor(df)
-    processor.print_unique_locations()
+    locations = processor.find_unique_locations()
 
-    captured = capsys.readouterr()
-    assert "CityA" in captured.out
-    assert "CityB" in captured.out
-    assert "CityC" in captured.out
+
+    assert "CityA" in locations
+    assert "CityB" in locations
+    assert "CityC" in locations

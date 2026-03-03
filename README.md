@@ -11,10 +11,15 @@ project will expand to perform more advanced data analysis.
 
 ## Usage
 Run main.py to read and display weather data to the console.
+Use the analysis notebook to test out various functions
+Use app.py to describe and create visualizations of the data.
 
 ## Technologies
 - Python 3.10
 - pandas
+- pytest
+- seaborn
+- matplotlib
 
 ## Installation
 Make sure you have:
@@ -34,11 +39,19 @@ pip install -e ".[dev]"
 
 ## Steps
 
-For module 5, I added unit tests. I have two modules I wanted to test, "loader.py" and "stats.py". I created a new tests
-directory to put my tests into, complete with an __init__.py file to make it a package. I then created two test files, 
-one for each module. In these files, I wrote unit tests to check the functionality of the methods in the loader and 
-stats modules. I used the pytest framework, using the pytest--cov plugin to check the code coverage of my tests. 
-I ran the tests to ensure that they were working correctly and that all important code was covered.
+For module 7, I refactored my code to take advantage of asynchronous programming and multiprocessing.
+Async changes:
+- The loader.py file was modified to use asynchronous programming to read CSV files concurrently, improving the 
+efficiency of data loading.
+- The visualize.py file was updated to use multiprocessing to create visualizations in parallel, which can speed up the 
+generation of multiple plots. Calculating the KDE of each plot is very CPU intensive, so this change should 
+significantly reduce the time taken to create visualizations. Another potential optimization would be to compute these
+separately in their own processes, then load the results back into the main process to create the final visualizations.
+- The test_visuals.py file was updated to test the new asynchronous and multiprocessing code, ensuring that the changes 
+do not break existing functionality. Tests were also updated/created to test added functionality such as the addition of
+an output directory and the ability to specify which visualizations to create within one function.
+- The app.py file was updated to use the new asynchronous and multiprocessing code, allowing for faster data loading and 
+visualization when running the application.
 
 ---
 

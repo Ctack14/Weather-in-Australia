@@ -1,0 +1,9 @@
+"row ID","Location","MinTemp","MaxTemp","Rainfall","Evaporation","Sunshine","WindGustDir","WindGustSpeed","WindDir9am","WindDir3pm","WindSpeed9am","WindSpeed3pm","Humidity9am","Humidity3pm","Pressure9am","Pressure3pm","Cloud9am","Cloud3pm","Temp9am","Temp3pm","RainToday","RainTomorrow"
+"Row0","Albury",13.4,22.9,0.6,,,"W",44,"W","WNW",20,24,71,22,1007.7,1007.1,8,,16.9,21.8,"No",0
+"Row1","Albury",7.4,25.1,0,,,"WNW",44,"NNW","WSW",4,22,44,25,1010.6,1007.8,,,17.2,24.3,"No",0
+"Row2","Albury",17.5,32.3,1,,,"W",41,"ENE","NW",7,20,82,33,1010.8,1006,7,8,17.8,29.7,"No",0
+"Row3","Albury",14.6,29.7,0.2,,,"WNW",56,"W","W",19,24,55,23,1009.2,1005.4,,,20.6,28.9,"No",0
+"Row4","Albury",7.7,26.7,0,,,"W",35,"SSE","W",6,17,48,19,1013.4,1010.1,,,16.3,25.5,"No",0
+"Row5","Albury",13.1,30.1,1.4,,,"W",28,"S","SSE",15,11,58,27,1007,1005.7,,,20.1,28.2,"Yes",0
+"Row6","Albury",13.4,30.4,0,,,"N",30,"SSE","ESE",17,6,48,22,1011.8,1008.7,,,20.4,28.8,"No",1
+"Row7","Albury",15.9,21.7,2.2,,,"NNE",31,"NE","ENE",15,13,89,91,1010.5,1004.2,8,8,15.9,17,"Yes",1
