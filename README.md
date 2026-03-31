@@ -39,20 +39,48 @@ pip install -e ".[dev]"
 
 ## Steps
 
-For module 7, I refactored my code to take advantage of asynchronous programming and multiprocessing.
-Async changes:
-- The loader.py file was modified to use asynchronous programming to read CSV files concurrently, improving the 
-efficiency of data loading.
-- The visualize.py file was updated to use multiprocessing to create visualizations in parallel, which can speed up the 
-generation of multiple plots. Calculating the KDE of each plot is very CPU intensive, so this change should 
-significantly reduce the time taken to create visualizations. Another potential optimization would be to compute these
-separately in their own processes, then load the results back into the main process to create the final visualizations.
-- The test_visuals.py file was updated to test the new asynchronous and multiprocessing code, ensuring that the changes 
-do not break existing functionality. Tests were also updated/created to test added functionality such as the addition of
-an output directory and the ability to specify which visualizations to create within one function.
-- The app.py file was updated to use the new asynchronous and multiprocessing code, allowing for faster data loading and 
-visualization when running the application.
+For module 8, I migrated the project to a PySpark cluster simulated in Google Colab. The biggest mental shift I needed
+to make was understanding that Spark would handle the parallelization and distribution of data across the cluster, so I 
+needed to let go of my manual multiprocessing approach and instead focus on writing transformations that could be 
+executed in a distributed manner. I also had to adjust my mindset to think in terms of Spark's lazy evaluation model, 
+which meant that I needed to be more intentional about when and how I triggered the execution of my transformations.
+
+
+### Environment Setup
+
+This project was implemented using Google Colab as a virtual Spark cluster.
+
+Steps:
+1. Installed PySpark in Colab
+2. Created a SparkSession
+3. Uploaded dataset (Weather Training Data.csv)
+4. Executed my transformations and analyses within the Spark environment
+
+### Key Changes for PySpark Migration
+
+#### 1. Data Loading
+- Replaced pandas `read_csv()` with Spark `spark.read.csv()`
+
+#### 2. Data Types and Cleaning
+- Explicitly cast numeric columns using `try_cast`
+- Converted the categorical columns (RainToday, RainTomorrow) into boolean values using Spark functions
+(`col`, `when`, `lower`, `trim`) instead of pandas operations
+
+
+#### 3. Replacing pandas Operations
+- Replaced pandas `.groupby()` with Spark `.groupBy()`
+- Replaced column operations with `.withColumn()`
+
+#### 4. Removing Multiprocessing
+- Removed Python multiprocessing
+- Spark automatically handles parallel execution across partitions
+
+#### 5. Spark is Lazy
+- Threw in some `.show()` calls to trigger execution and view intermediate results
+
+#### 6. Visualization Strategy
+- Spark does not support direct plotting
+- Used `.toPandas()` on sampled data for visualization
+- Only used small subsets of the data for plotting to avoid memory issues
 
 ---
-
-The init file for the package was updated to reflect the new structure.
