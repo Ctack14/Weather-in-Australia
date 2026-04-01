@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Query History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Query History</h1>
+
+    {% if queries %}
+        <ul>
+            {% for entry in queries %}
+                <li>{{ entry.location or 'ALL' }} - {{ entry.graph_type }} - {{ entry.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</li>
+                    <br>
+                    {% if entry.image_path %}
+                        <img src="{{ entry.image_path }}" alt="Graph", width="600">
+                    {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No queries have been made yet.</p>
+    {% endif %}
+
+    <br><br>
+    <a href="/">Back to Home</a>
+</body>
+</html>

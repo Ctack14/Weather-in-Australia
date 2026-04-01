@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Weather Data Analyzer</h1>
+
+    <form action="/analyze" method="post">
+        <label>Graph Type:</label>
+        <select name = "graph">
+            <option value="rain_vs_temp">Rainfall vs Temperature</option>
+            <option value="wind_vs_temp">Wind Speed vs Temperature Change</option>
+        </select>
+        <select name="location">
+            <option value="ALL">All Locations</option>
+            {% for loc in locations %}
+                <option value="{{ loc }}">{{ loc }}</option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+
+        <button type="submit">Generate</button>
+    </form>
+
+    <br><br>
+
+    <a href="/history">View Query History</a>
+</body>
+</html>

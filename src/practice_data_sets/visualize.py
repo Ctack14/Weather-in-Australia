@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
+import matplotlib
+import pandas as pd
 
+matplotlib.use('Agg')  # Use a non-interactive backend for multiprocessing
 import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
@@ -12,14 +15,17 @@ class DataVisualizer:
     """Visualizes weather data"""
 
     def __init__(self, df, output_dir = None):
+        self.output_dir = output_dir
         self.df = df
-        self.sample_df = df.sample(n=2000)  # Sample a subset of the data for visualization
+        self.sample_df = df.sample(n=min(2000, len(df)))  # Sample a subset of the data for visualization
 
         # Set the output directory for saving plots. If not provided, it defaults to a "data/images" directory relative to this file.
         if output_dir is None:
             self.output_dir = Path(__file__).parent / "data" / "images"
         else:
             self.output_dir = Path(output_dir)
+
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
 
 
@@ -82,12 +88,32 @@ class DataVisualizer:
         plt.ylabel("Rainfall")
         plt.show()
 
+    def save_rainfall_vs_temperature(self):
+        """
+        Saves a scatter plot of rainfall vs. temperature to the output directory.
+        """
+        timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
+        filepath = self.output_dir / f"rainfall_vs_temperature{timestamp}.png"
+
+        sns.scatterplot(x=self.df["MaxTemp"],
+                        y=self.df["Rainfall"])
+        plt.title("Rainfall vs. Max Temperature")
+        plt.xlabel("Max Temperature")
+        plt.ylabel("Rainfall")
+        plt.tight_layout()
+        plt.savefig(filepath)
+        plt.close()
+        logger.info(f"Saved Rainfall vs. Max Temperature plot to {filepath}")
+
+        return f"/static/{filepath.name}"
+
 
     def display_wind_speed_vs_temp_change(self):
         """
         Displays a regression plotplot of wind speed based on how much the size of temperature difference of max and min temperature.
         """
 
+        plt.figure()
         sns.regplot(x=self.sample_df["MaxTemp"] - self.sample_df["MinTemp"],
                     y=self.sample_df["WindGustSpeed"],
                     scatter_kws={"color": "blue", "alpha": 0.5},
@@ -97,6 +123,33 @@ class DataVisualizer:
         plt.xlabel("Temperature Change (MaxTemp - MinTemp)")
         plt.ylabel("Wind Gust Speed")
         plt.show()
+
+    def save_wind_speed_vs_temp_change(self):
+        """
+        Saves a regression plot of wind speed vs. temperature change to the output directory.
+        """
+
+        timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
+
+
+
+        filepath = self.output_dir / f"wind_speed_vs_temp_change_{timestamp}.png"
+
+        plt.figure()
+        sns.regplot(x=self.df["MaxTemp"] - self.df["MinTemp"],
+                    y=self.df["WindGustSpeed"],
+                    scatter_kws={"color": "blue", "alpha": 0.5},
+                    line_kws={"color": "red", "linewidth": 2, "alpha": 1.0})
+
+        plt.title("Wind Gust Speed vs. Temperature Change")
+        plt.xlabel("Temperature Change (MaxTemp - MinTemp)")
+        plt.ylabel("Wind Gust Speed")
+        plt.tight_layout()
+        plt.savefig(filepath)
+        plt.close()
+        logger.info(f"Saved Wind Gust Speed vs. Temperature Change plot to {filepath}")
+
+        return f"/static/{filepath.name}"
 
 
     def display_evaporation_vs_sunshine(self):

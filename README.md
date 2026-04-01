@@ -12,7 +12,7 @@ project will expand to perform more advanced data analysis.
 ## Usage
 Run main.py to read and display weather data to the console.
 Use the analysis notebook to test out various functions
-Use app.py to describe and create visualizations of the data.
+Use app.py to launch the flask web application to display the weather data and visualizations. (run from within src)
 
 ## Technologies
 - Python 3.10
@@ -39,48 +39,17 @@ pip install -e ".[dev]"
 
 ## Steps
 
-For module 8, I migrated the project to a PySpark cluster simulated in Google Colab. The biggest mental shift I needed
-to make was understanding that Spark would handle the parallelization and distribution of data across the cluster, so I 
-needed to let go of my manual multiprocessing approach and instead focus on writing transformations that could be 
-executed in a distributed manner. I also had to adjust my mindset to think in terms of Spark's lazy evaluation model, 
-which meant that I needed to be more intentional about when and how I triggered the execution of my transformations.
+For module 9, I made a flask web application to display the weather data and visualizations. The app.py file contains 
+the code for the flask application, which reads the weather data and creates visualizations using seaborn and matplotlib. 
+The application has a simple interface that allows users to select different types of visualizations to display.
+The weather data CSV is loaded once and cached to improve performance. 
+Graph generations are stored in a SQLite database to keep track of user interactions and previous queries.
+### Endpoints
+
+- `/`: The home page of the application, which displays a welcome message and links to the different visualizations.
+- `/analyze`: This endpoint generates and displays a vizualization of data based on the user selection.
+- `/history`: This endpoint displays previous queries and their results. Basic logging info is stored using SQLite. The graphs are also displayed here.
 
 
-### Environment Setup
-
-This project was implemented using Google Colab as a virtual Spark cluster.
-
-Steps:
-1. Installed PySpark in Colab
-2. Created a SparkSession
-3. Uploaded dataset (Weather Training Data.csv)
-4. Executed my transformations and analyses within the Spark environment
-
-### Key Changes for PySpark Migration
-
-#### 1. Data Loading
-- Replaced pandas `read_csv()` with Spark `spark.read.csv()`
-
-#### 2. Data Types and Cleaning
-- Explicitly cast numeric columns using `try_cast`
-- Converted the categorical columns (RainToday, RainTomorrow) into boolean values using Spark functions
-(`col`, `when`, `lower`, `trim`) instead of pandas operations
-
-
-#### 3. Replacing pandas Operations
-- Replaced pandas `.groupby()` with Spark `.groupBy()`
-- Replaced column operations with `.withColumn()`
-
-#### 4. Removing Multiprocessing
-- Removed Python multiprocessing
-- Spark automatically handles parallel execution across partitions
-
-#### 5. Spark is Lazy
-- Threw in some `.show()` calls to trigger execution and view intermediate results
-
-#### 6. Visualization Strategy
-- Spark does not support direct plotting
-- Used `.toPandas()` on sampled data for visualization
-- Only used small subsets of the data for plotting to avoid memory issues
 
 ---

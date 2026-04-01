@@ -12,6 +12,7 @@ dependencies = [
     "numpy",
     "matplotlib",
     "seaborn",
+    "flask_sqlalchemy",
 ]
 
 [build-system]
