@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload CSV — Weather Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .upload-container {
+            max-width: 500px;
+            margin: 60px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .upload-container h1 { margin-top: 0; font-size: 1.5em; }
+        .file-input-wrapper {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+        .file-input-wrapper input[type="file"] { margin-top: 10px; }
+        .flash-error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        .user-bar {
+            text-align: right;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-bar">
+        Logged in as <strong>{{ session.username }}</strong> · <a href="/logout">Log out</a>
+    </div>
+
+    <div class="upload-container">
+        <h1>Upload Weather Data</h1>
+        <p style="color:#666;">Upload an Australian weather CSV file to start analyzing.</p>
+
+        {% with messages = get_flashed_messages(category_filter=["error"]) %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="flash-error">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            <div class="file-input-wrapper">
+                <p style="margin:0 0 10px 0; font-weight:500;">Choose a CSV file</p>
+                <input type="file" name="file" accept=".csv" required>
+            </div>
+            <button type="submit" style="width:100%;">Upload & Analyze</button>
+        </form>
+    </div>
+</body>
+</html>

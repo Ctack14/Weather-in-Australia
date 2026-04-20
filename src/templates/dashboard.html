@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — Weather Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            font-size: 0.9em;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+        .user-bar a { margin-left: 15px; }
+
+        .dashboard-container {
+            max-width: 960px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        /* Category buttons */
+        .category-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .category-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            background: white;
+            color: #4a90e2;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .category-btn:hover {
+            background: #eaf2fc;
+        }
+        .category-btn.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        /* City dropdown */
+        .city-selector {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .city-selector.visible { display: block; }
+        .city-selector select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        /* Results area */
+        .results-area {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .results-area.visible { display: block; }
+        .results-area img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .results-area .summary {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.1em;
+        }
+        .spinner.visible { display: block; }
+
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .error-msg.visible { display: block; }
+
+        /* Prediction input form */
+        .prediction-form {
+            display: none;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+        }
+        .prediction-form.visible { display: block; }
+        .prediction-form h3 { margin-top: 0; }
+        .pred-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .pred-grid label {
+            font-size: 0.85em;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .pred-grid input, .pred-grid select {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .pred-submit-btn {
+            padding: 10px 30px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .pred-submit-btn:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+
+    <div class="user-bar">
+        <span>Weather Data Analyzer</span>
+        <span>
+            Logged in as <strong>{{ session.username }}</strong>
+            <a href="/upload">Upload New CSV</a>
+            <a href="/logout">Log Out</a>
+        </span>
+    </div>
+
+    <div class="dashboard-container">
+        <h1 style="margin-bottom:5px;">Weather Dashboard</h1>
+        <p style="color:#666; margin-top:0;">Select a category, then choose a city to see the analysis.</p>
+
+        <!-- 3 Category Buttons -->
+        <div class="category-buttons">
+            <button class="category-btn" data-category="temperature">
+                🌡 Temperature Trends
+            </button>
+            <button class="category-btn" data-category="rainfall">
+                🌧 Rainfall Patterns
+            </button>
+            <button class="category-btn" data-category="prediction">
+                🔮 Rain Prediction
+            </button>
+        </div>
+
+        <!-- City Dropdown (appears after button click) -->
+        <div class="city-selector" id="citySelector">
+            <label for="cityDropdown" style="font-weight:600;">Select a city:</label>
+            <select id="cityDropdown">
+                <option value="">— Choose a city —</option>
+            </select>
+        </div>
+
+        <!-- Error -->
+        <div class="error-msg" id="errorMsg"></div>
+
+        <!-- Prediction Input Form (shown for Rain Prediction category) -->
+        <div class="prediction-form" id="predictionForm">
+            <h3>Enter Weather Conditions</h3>
+            <p style="color:#666; margin-top:0; font-size:0.9em;">
+                Values are pre-filled with the selected city's typical conditions. Adjust as needed.
+            </p>
+            <div class="pred-grid" id="predGrid">
+                <!-- Populated dynamically by JS -->
+            </div>
+            <button class="pred-submit-btn" id="runPrediction">Run Prediction</button>
+        </div>
+
+        <!-- Loading -->
+        <div class="spinner" id="spinner">Loading analysis...</div>
+
+        <!-- Results -->
+        <div class="results-area" id="resultsArea">
+            <img id="chartImage" src="" alt="Chart">
+            <div class="summary" id="summaryText"></div>
+        </div>
+    </div>
+
+<script>
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const citySelector = document.getElementById('citySelector');
+    const cityDropdown = document.getElementById('cityDropdown');
+    const resultsArea = document.getElementById('resultsArea');
+    const chartImage = document.getElementById('chartImage');
+    const summaryText = document.getElementById('summaryText');
+    const spinner = document.getElementById('spinner');
+    const errorMsg = document.getElementById('errorMsg');
+    const predictionForm = document.getElementById('predictionForm');
+    const predGrid = document.getElementById('predGrid');
+    const runPredictionBtn = document.getElementById('runPrediction');
+
+    let activeCategory = null;
+    let citiesLoaded = false;
+
+    // Nice labels for feature columns
+    const featureLabels = {
+        'MinTemp': 'Min Temp (°C)',
+        'MaxTemp': 'Max Temp (°C)',
+        'Rainfall': 'Rainfall (mm)',
+        'Evaporation': 'Evaporation (mm)',
+        'Sunshine': 'Sunshine (hrs)',
+        'WindGustSpeed': 'Wind Gust (km/h)',
+        'WindSpeed9am': 'Wind 9am (km/h)',
+        'WindSpeed3pm': 'Wind 3pm (km/h)',
+        'Humidity9am': 'Humidity 9am (%)',
+        'Humidity3pm': 'Humidity 3pm (%)',
+        'Pressure9am': 'Pressure 9am (hPa)',
+        'Pressure3pm': 'Pressure 3pm (hPa)',
+        'Cloud9am': 'Cloud 9am (oktas)',
+        'Cloud3pm': 'Cloud 3pm (oktas)',
+        'Temp9am': 'Temp 9am (°C)',
+        'Temp3pm': 'Temp 3pm (°C)',
+        'RainToday': 'Rain Today',
+    };
+
+    // Load city list once
+    async function loadCities() {
+        if (citiesLoaded) return;
+        try {
+            const resp = await fetch('/api/cities');
+            const data = await resp.json();
+            if (data.cities) {
+                cityDropdown.innerHTML = '<option value="">— Choose a city —</option>';
+                data.cities.forEach(city => {
+                    const opt = document.createElement('option');
+                    opt.value = city;
+                    opt.textContent = city;
+                    cityDropdown.appendChild(opt);
+                });
+                citiesLoaded = true;
+            }
+        } catch (err) {
+            showError('Failed to load city list.');
+        }
+    }
+
+    // Handle category button clicks
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            categoryButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCategory = btn.dataset.category;
+
+            await loadCities();
+            citySelector.classList.add('visible');
+
+            hideResults();
+            hideError();
+            hidePredictionForm();
+
+            if (cityDropdown.value) {
+                onCitySelected(cityDropdown.value);
+            }
+        });
+    });
+
+    // Handle city selection change
+    cityDropdown.addEventListener('change', () => {
+        if (!activeCategory || !cityDropdown.value) return;
+        hideError();
+        hideResults();
+        hidePredictionForm();
+        onCitySelected(cityDropdown.value);
+    });
+
+    // Decide what to do when a city is selected
+    async function onCitySelected(city) {
+        hideResults();
+        hidePredictionForm();
+
+        if (activeCategory === 'prediction') {
+            // Load defaults and show the input form — do NOT run prediction yet
+            await loadPredictionDefaults(city);
+        } else {
+            fetchAnalysis(activeCategory, city);
+        }
+    }
+
+    // Run prediction button — gather form values and send them
+    runPredictionBtn.addEventListener('click', () => {
+        const city = cityDropdown.value;
+        if (!city) return;
+
+        // Gather values from the form
+        const input_data = {};
+        const inputs = predGrid.querySelectorAll('input, select');
+        inputs.forEach(inp => {
+            input_data[inp.name] = parseFloat(inp.value);
+        });
+
+        // Keep form visible so user can see what they entered
+        fetchAnalysis('prediction', city, input_data);
+    });
+
+    // Load prediction defaults for a city and build the form
+    async function loadPredictionDefaults(city) {
+        showSpinner();
+        hideError();
+
+        try {
+            const resp = await fetch('/api/prediction-defaults', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({city})
+            });
+            const data = await resp.json();
+            hideSpinner();
+
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+
+            buildPredictionForm(data.features, data.defaults);
+            predictionForm.classList.add('visible');
+        } catch (err) {
+            hideSpinner();
+            showError('Failed to load prediction defaults.');
+        }
+    }
+
+    // Build the prediction input form
+    function buildPredictionForm(features, defaults) {
+        predGrid.innerHTML = '';
+        features.forEach(feat => {
+            const wrapper = document.createElement('div');
+            const label = document.createElement('label');
+            label.textContent = featureLabels[feat] || feat;
+            label.setAttribute('for', 'pred_' + feat);
+            wrapper.appendChild(label);
+
+            if (feat === 'RainToday') {
+                const sel = document.createElement('select');
+                sel.id = 'pred_' + feat;
+                sel.name = feat;
+                sel.innerHTML = `<option value="0" ${defaults[feat] == 0 ? 'selected' : ''}>No</option>
+                                 <option value="1" ${defaults[feat] == 1 ? 'selected' : ''}>Yes</option>`;
+                wrapper.appendChild(sel);
+            } else {
+                const inp = document.createElement('input');
+                inp.type = 'number';
+                inp.step = '0.1';
+                inp.id = 'pred_' + feat;
+                inp.name = feat;
+                inp.value = defaults[feat];
+                wrapper.appendChild(inp);
+            }
+
+            predGrid.appendChild(wrapper);
+        });
+    }
+
+    // Run prediction button
+    runPredictionBtn.addEventListener('click', () => {
+        const city = cityDropdown.value;
+        if (!city) return;
+
+        // Gather values from the form
+        const input_data = {};
+        const inputs = predGrid.querySelectorAll('input, select');
+        inputs.forEach(inp => {
+            input_data[inp.name] = parseFloat(inp.value);
+        });
+
+        hidePredictionForm();
+        fetchAnalysis('prediction', city, input_data);
+    });
+
+    // Fetch analysis from the API
+    async function fetchAnalysis(category, city, input_data = null) {
+        hideResults();
+        showSpinner();
+        hideError();
+
+        const body = {category, city};
+        if (input_data) body.input_data = input_data;
+
+        try {
+            const resp = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+
+            const data = await resp.json();
+            hideSpinner();
+
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+
+            chartImage.src = 'data:image/png;base64,' + data.image;
+            summaryText.innerHTML = data.summary;
+            resultsArea.classList.add('visible');
+        } catch (err) {
+            hideSpinner();
+            showError('Something went wrong. Please try again.');
+        }
+    }
+
+    function showSpinner() { spinner.classList.add('visible'); }
+    function hideSpinner() { spinner.classList.remove('visible'); }
+    function hideResults() { resultsArea.classList.remove('visible'); }
+    function hidePredictionForm() { predictionForm.classList.remove('visible'); }
+    function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.classList.add('visible');
+    }
+    function hideError() { errorMsg.classList.remove('visible'); }
+</script>
+
+</body>
+</html>
