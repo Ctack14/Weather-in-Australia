@@ -2,8 +2,10 @@ import asyncio
 from flask import Flask, render_template, request
 from practice_data_sets.loader import DataLoader
 from practice_data_sets.visualize import DataVisualizer
+from practice_data_sets.predictor import RainPredictor, feature_columns
 from db import db
 from models import RequestLog, Query
+import traceback
 
 
 app = Flask(__name__)
@@ -15,6 +17,7 @@ with app.app_context():
     db.create_all()
 
 df_cache = None
+predictor_cache = None
 
 async def load_data_once():
     '''Work with async data loading and cache the result to avoid reloading on every request'''
@@ -24,6 +27,15 @@ async def load_data_once():
         loader = DataLoader(["Weather Training Data.csv"])
         df_cache = await loader.load_files()
     return df_cache
+
+def get_predictor():
+    """Train the predictor models and then cache the trained predictor for future use"""
+    global predictor_cache
+    if predictor_cache is None:
+        df = asyncio.run(load_data_once())
+        predictor_cache = RainPredictor(df)
+        predictor_cache.train()
+    return predictor_cache
 
 @app.route("/")
 def index():
@@ -66,6 +78,45 @@ def analyze():
     db.session.commit()
 
     return render_template("results.html", image=image_path, location=location)
+
+
+@app.route("/predict", methods=["GET", "POST"])
+def predict():
+    """
+    GET: Show prediction form
+    POST: run the prediction model and show results
+    """
+    df = asyncio.run(load_data_once())
+    locations = sorted(df["Location"].dropna().unique())
+
+    if request.method == "GET":
+        return render_template("predict.html", locations=locations)
+
+
+
+    model_choice = request.form.get("model_choice", "random_forest")
+
+    input_data = {}
+    for col in feature_columns:
+        input_data[col] = request.form.get(col)
+
+    try:
+        predictor = get_predictor()
+        result = predictor.predict(input_data, model_choice=model_choice)
+    except ValueError as e:
+        traceback.print_exc()
+        return render_template("predict.html", locations=locations, error=str(e))
+
+    metrics = predictor.get_metrics()
+    importances = predictor.get_feature_importances()
+
+    return render_template(
+        "prediction_results.html",
+        result=result,
+        metrics=metrics,
+        importances=importances,
+    )
+
 
 
 @app.route("/history")

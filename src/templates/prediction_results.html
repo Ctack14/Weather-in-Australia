@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .prediction-card {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .prediction-yes { background: #e8f4fd; border: 2px solid #2196F3; }
+        .prediction-no { background: #e8f5e9; border: 2px solid #4CAF50; }
+
+        .prediction-label { font-size: 2em; font-weight: bold; margin: 10px 0; }
+        .prediction-yes .prediction-label { color: #1565C0; }
+        .prediction-no .prediction-label  { color: #2E7D32; }
+
+        .confidence { font-size: 1.1em; color: #555; }
+
+        /* Fixed Probability Bar */
+        .prob-bar {
+            display: flex;
+            height: 35px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 500px;
+            margin: 15px auto;
+            background: #eee;
+        }
+        .prob-no, .prob-yes {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            transition: width 0.5s ease;
+            white-space: nowrap;
+            min-width: fit-content; /* Prevents text clipping */
+            padding: 0 5px;
+        }
+        .prob-no  { background: #4CAF50; color: white; }
+        .prob-yes { background: #2196F3; color: white; }
+
+        .metrics-section { max-width: 700px; margin: 30px auto; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .metric-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-value { font-size: 1.5em; font-weight: bold; color: #4a90e2; }
+
+        .confusion-matrix { margin: 20px auto; border-collapse: collapse; }
+        .confusion-matrix th, .confusion-matrix td {
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .importances-list { max-width: 500px; margin: 20px auto; }
+        .importance-row { display: flex; align-items: center; margin: 8px 0; }
+        .importance-name { width: 140px; font-size: 0.9em; text-align: right; padding-right: 12px; }
+        .importance-bar-bg { flex: 1; height: 18px; background: #eee; border-radius: 4px; }
+        .importance-bar { height: 100%; background: #4a90e2; border-radius: 4px; }
+        .importance-val { width: 60px; font-size: 0.8em; padding-left: 10px; color: #666; }
+        .model-name { text-transform: capitalize; }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center;">Prediction Analysis</h1>
+
+    <!-- Result Card -->
+    <div class="prediction-card {{ 'prediction-yes' if result.prediction == 1 else 'prediction-no' }}">
+        <p style="margin:0; font-weight: 500;">Forecast for Tomorrow:</p>
+        <div class="prediction-label">
+            {% if result.prediction == 1 %} &#x1f327; Rain Expected {% else %} ☀ Clear Skies {% endif %}
+        </div>
+        <p class="confidence">
+            Confidence: <strong>{{ result.confidence }}%</strong> |
+            Model: <strong class="model-name">{{ result.model_used | replace('_', ' ') }}</strong>
+        </p>
+
+        <div class="prob-bar">
+            <div class="prob-no" style="width: {{ result.probability_no_rain }}%;">
+                No Rain: {{ result.probability_no_rain }}%
+            </div>
+            <div class="prob-yes" style="width: {{ result.probability_rain }}%;">
+                Rain: {{ result.probability_rain }}%
+            </div>
+        </div>
+    </div>
+
+    <div class="metrics-section">
+        <h2 style="text-align:center;">Model Evaluation</h2>
+
+        {% for model_name, m in metrics.items() %}
+            <h3 style="text-align:center; border-bottom: 1px solid #ddd; padding-bottom: 10px;" class="model-name">
+                {{ model_name | replace('_', ' ') }} Performance
+            </h3>
+            <div class="metrics-grid">
+                <div class="metric-card"><h4>Accuracy</h4><div class="metric-value">{{ (m.accuracy * 100) | round(1) }}%</div></div>
+                <div class="metric-card"><h4>Precision</h4><div class="metric-value">{{ (m.precision * 100) | round(1) }}%</div></div>
+                <div class="metric-card"><h4>Recall</h4><div class="metric-value">{{ (m.recall * 100) | round(1) }}%</div></div>
+                <div class="metric-card"><h4>F1 Score</h4><div class="metric-value">{{ (m.f1 * 100) | round(1) }}%</div></div>
+            </div>
+
+            {% if m.confusion_matrix %}
+            <table class="confusion-matrix">
+                <tr><th>Actual \ Pred</th><th>No Rain</th><th>Rain</th></tr>
+                <tr><th>No Rain</th><td>{{ m.confusion_matrix[0][0] }}</td><td>{{ m.confusion_matrix[0][1] }}</td></tr>
+                <tr><th>Rain</th><td>{{ m.confusion_matrix[1][0] }}</td><td>{{ m.confusion_matrix[1][1] }}</td></tr>
+            </table>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Feature Importance Section -->
+        {% if importances %}
+        <h3 style="text-align:center; margin-top:40px;">Key Weather Drivers</h3>
+        <div class="importances-list">
+            {# Calculate max importance dynamically to ensure bars scale correctly #}
+            {% set max_val = importances.values() | max if importances.values() else 1 %}
+            {% for feat, imp in importances.items() %}
+                <div class="importance-row">
+                    <span class="importance-name">{{ feat | replace('_', ' ') }}</span>
+                    <div class="importance-bar-bg">
+                        <div class="importance-bar" style="width: {{ (imp / max_val * 100) }}%;"></div>
+                    </div>
+                    <span class="importance-val">{{ (imp * 100) | round(1) }}%</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="text-align:center; margin: 40px 0;">
+        <a href="/predict">New Prediction</a> | <a href="/">Dashboard</a>
+    </div>
+</body>
+</html>

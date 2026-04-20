@@ -13,6 +13,7 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "flask_sqlalchemy",
+    "scikit-learn"
 ]
 
 [build-system]
