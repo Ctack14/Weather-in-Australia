@@ -41,13 +41,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .category-btn:hover {
-            background: #eaf2fc;
-        }
-        .category-btn.active {
-            background: #4a90e2;
-            color: white;
-        }
+        .category-btn:hover { background: #eaf2fc; }
+        .category-btn.active { background: #4a90e2; color: white; }
 
         /* City dropdown */
         .city-selector {
@@ -145,6 +140,21 @@
             cursor: pointer;
         }
         .pred-submit-btn:hover { background: #357abd; }
+
+        /* Back button */
+        .back-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #eee;
+            color: #444;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .back-btn:hover { background: #ddd; }
     </style>
 </head>
 <body>
@@ -175,7 +185,7 @@
             </button>
         </div>
 
-        <!-- City Dropdown (appears after button click) -->
+        <!-- City Dropdown -->
         <div class="city-selector" id="citySelector">
             <label for="cityDropdown" style="font-weight:600;">Select a city:</label>
             <select id="cityDropdown">
@@ -186,16 +196,14 @@
         <!-- Error -->
         <div class="error-msg" id="errorMsg"></div>
 
-        <!-- Prediction Input Form (shown for Rain Prediction category) -->
+        <!-- Prediction Input Form -->
         <div class="prediction-form" id="predictionForm">
             <h3>Enter Weather Conditions</h3>
             <p style="color:#666; margin-top:0; font-size:0.9em;">
                 Values are pre-filled with the selected city's typical conditions. Adjust as needed.
             </p>
-            <div class="pred-grid" id="predGrid">
-                <!-- Populated dynamically by JS -->
-            </div>
-            <button class="pred-submit-btn" id="runPrediction">Run Prediction</button>
+            <div class="pred-grid" id="predGrid"></div>
+            <button class="pred-submit-btn" id="runPrediction" type="button">Run Prediction</button>
         </div>
 
         <!-- Loading -->
@@ -205,10 +213,12 @@
         <div class="results-area" id="resultsArea">
             <img id="chartImage" src="" alt="Chart">
             <div class="summary" id="summaryText"></div>
+            <button class="back-btn" id="backBtn" type="button">← Back to Form</button>
         </div>
     </div>
 
 <script>
+(function() {
     const categoryButtons = document.querySelectorAll('.category-btn');
     const citySelector = document.getElementById('citySelector');
     const cityDropdown = document.getElementById('cityDropdown');
@@ -220,11 +230,11 @@
     const predictionForm = document.getElementById('predictionForm');
     const predGrid = document.getElementById('predGrid');
     const runPredictionBtn = document.getElementById('runPrediction');
+    const backBtn = document.getElementById('backBtn');
 
     let activeCategory = null;
     let citiesLoaded = false;
 
-    // Nice labels for feature columns
     const featureLabels = {
         'MinTemp': 'Min Temp (°C)',
         'MaxTemp': 'Max Temp (°C)',
@@ -245,7 +255,6 @@
         'RainToday': 'Rain Today',
     };
 
-    // Load city list once
     async function loadCities() {
         if (citiesLoaded) return;
         try {
@@ -253,7 +262,7 @@
             const data = await resp.json();
             if (data.cities) {
                 cityDropdown.innerHTML = '<option value="">— Choose a city —</option>';
-                data.cities.forEach(city => {
+                data.cities.forEach(function(city) {
                     const opt = document.createElement('option');
                     opt.value = city;
                     opt.textContent = city;
@@ -266,10 +275,10 @@
         }
     }
 
-    // Handle category button clicks
-    categoryButtons.forEach(btn => {
-        btn.addEventListener('click', async () => {
-            categoryButtons.forEach(b => b.classList.remove('active'));
+    // Category button clicks
+    categoryButtons.forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+            categoryButtons.forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             activeCategory = btn.dataset.category;
 
@@ -286,8 +295,8 @@
         });
     });
 
-    // Handle city selection change
-    cityDropdown.addEventListener('change', () => {
+    // City dropdown change
+    cityDropdown.addEventListener('change', function() {
         if (!activeCategory || !cityDropdown.value) return;
         hideError();
         hideResults();
@@ -295,36 +304,15 @@
         onCitySelected(cityDropdown.value);
     });
 
-    // Decide what to do when a city is selected
-    async function onCitySelected(city) {
-        hideResults();
-        hidePredictionForm();
-
+    function onCitySelected(city) {
         if (activeCategory === 'prediction') {
-            // Load defaults and show the input form — do NOT run prediction yet
-            await loadPredictionDefaults(city);
+            loadPredictionDefaults(city);
         } else {
-            fetchAnalysis(activeCategory, city);
+            fetchAnalysis(activeCategory, city, null);
         }
     }
 
-    // Run prediction button — gather form values and send them
-    runPredictionBtn.addEventListener('click', () => {
-        const city = cityDropdown.value;
-        if (!city) return;
-
-        // Gather values from the form
-        const input_data = {};
-        const inputs = predGrid.querySelectorAll('input, select');
-        inputs.forEach(inp => {
-            input_data[inp.name] = parseFloat(inp.value);
-        });
-
-        // Keep form visible so user can see what they entered
-        fetchAnalysis('prediction', city, input_data);
-    });
-
-    // Load prediction defaults for a city and build the form
+    // Load prediction defaults and show form
     async function loadPredictionDefaults(city) {
         showSpinner();
         hideError();
@@ -333,7 +321,7 @@
             const resp = await fetch('/api/prediction-defaults', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({city})
+                body: JSON.stringify({city: city})
             });
             const data = await resp.json();
             hideSpinner();
@@ -351,11 +339,11 @@
         }
     }
 
-    // Build the prediction input form
     function buildPredictionForm(features, defaults) {
         predGrid.innerHTML = '';
-        features.forEach(feat => {
+        features.forEach(function(feat) {
             const wrapper = document.createElement('div');
+
             const label = document.createElement('label');
             label.textContent = featureLabels[feat] || feat;
             label.setAttribute('for', 'pred_' + feat);
@@ -365,13 +353,21 @@
                 const sel = document.createElement('select');
                 sel.id = 'pred_' + feat;
                 sel.name = feat;
-                sel.innerHTML = `<option value="0" ${defaults[feat] == 0 ? 'selected' : ''}>No</option>
-                                 <option value="1" ${defaults[feat] == 1 ? 'selected' : ''}>Yes</option>`;
+                const opt0 = document.createElement('option');
+                opt0.value = '0';
+                opt0.textContent = 'No';
+                if (defaults[feat] == 0) opt0.selected = true;
+                sel.appendChild(opt0);
+                const opt1 = document.createElement('option');
+                opt1.value = '1';
+                opt1.textContent = 'Yes';
+                if (defaults[feat] == 1) opt1.selected = true;
+                sel.appendChild(opt1);
                 wrapper.appendChild(sel);
             } else {
                 const inp = document.createElement('input');
                 inp.type = 'number';
-                inp.step = '0.1';
+                inp.step = '1';
                 inp.id = 'pred_' + feat;
                 inp.name = feat;
                 inp.value = defaults[feat];
@@ -382,36 +378,45 @@
         });
     }
 
-    // Run prediction button
-    runPredictionBtn.addEventListener('click', () => {
+    // Run Prediction button
+    runPredictionBtn.addEventListener('click', function() {
         const city = cityDropdown.value;
         if (!city) return;
 
-        // Gather values from the form
-        const input_data = {};
+        const inputData = {};
         const inputs = predGrid.querySelectorAll('input, select');
-        inputs.forEach(inp => {
-            input_data[inp.name] = parseFloat(inp.value);
+        inputs.forEach(function(inp) {
+            inputData[inp.name] = parseFloat(inp.value);
         });
 
-        hidePredictionForm();
-        fetchAnalysis('prediction', city, input_data);
+        fetchAnalysis('prediction', city, inputData);
     });
 
-    // Fetch analysis from the API
-    async function fetchAnalysis(category, city, input_data = null) {
+    // Back button — go back to the prediction form
+    backBtn.addEventListener('click', function() {
         hideResults();
+        if (activeCategory === 'prediction') {
+            predictionForm.classList.add('visible');
+        }
+    });
+
+    // Core fetch function
+    async function fetchAnalysis(category, city, inputData) {
+        hideResults();
+        hidePredictionForm();
         showSpinner();
         hideError();
 
-        const body = {category, city};
-        if (input_data) body.input_data = input_data;
+        var payload = {category: category, city: city};
+        if (inputData !== null && inputData !== undefined) {
+            payload.input_data = inputData;
+        }
 
         try {
             const resp = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body)
+                body: JSON.stringify(payload)
             });
 
             const data = await resp.json();
@@ -424,6 +429,14 @@
 
             chartImage.src = 'data:image/png;base64,' + data.image;
             summaryText.innerHTML = data.summary;
+
+            // Only show back button for prediction category
+            if (activeCategory === 'prediction') {
+                backBtn.style.display = 'inline-block';
+            } else {
+                backBtn.style.display = 'none';
+            }
+
             resultsArea.classList.add('visible');
         } catch (err) {
             hideSpinner();
@@ -440,6 +453,7 @@
         errorMsg.classList.add('visible');
     }
     function hideError() { errorMsg.classList.remove('visible'); }
+})();
 </script>
 
 </body>

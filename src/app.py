@@ -177,6 +177,7 @@ def api_analyze():
         return jsonify({"error": "No data uploaded yet"}), 400
 
     data = request.get_json()
+    print("RAW JSON:", data)
     category = data.get("category")
     city = data.get("city")
 
@@ -193,7 +194,8 @@ def api_analyze():
         elif category == "rainfall":
             image_b64, summary = _rainfall_analysis(city_df, city)
         elif category == "prediction":
-            image_b64, summary = _prediction_analysis(city_df, city)
+            input_data = data.get("input_data")
+            image_b64, summary = _prediction_analysis(city_df, city, input_data)
         else:
             return jsonify({"error": f"Unknown category: {category}"}), 400
 
@@ -328,9 +330,9 @@ def _prediction_analysis(city_df, city, input_data=None):
                 median = city_df[col].median()
                 input_data[col] = median if not pd.isna(median) else 0.0
 
-    print("INPUT DATA:", input_data)  # <-- add this
+    print("INPUT DATA:", input_data)
     result = predictor.predict(input_data, model_choice="random_forest")
-    print("RESULT:", result)  # <-- and this
+    print("RESULT:", result)
 
 
     # Feature importance bar chart
