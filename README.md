@@ -22,6 +22,10 @@ Use app.py to launch the flask web application to display the weather data and v
 - matplotlib
 - scikit-learn
 - Flask
+- Flask-SQLAlchemy
+- SQLite
+- Werkzeug
+- JavaScript
 
 ## Installation
 Make sure you have:
@@ -41,31 +45,49 @@ pip install -e ".[dev]"
 
 ## Steps
 
-For module 10, I added a rain prediction feature. Scikit-learn's Random Forest Classifier is used to predict whether it
-will rain the next day based on input fields. You access the fields through a link on the home page (index) of the 
-application. The model is trained on the entire dataset (Weather Training Data.csv) in an 80/20 split for training and 
-test sets, and uses stratified sampling to keep the balance even between trees. The model is trained on the first 
-prediction request and is cached for future use. 
+Module 11 required a complete rework of a lot of things. I ended up using it as an opportunity to restructure some of 
+the functions I was using to be slightly different. I included most functions right inside of app.py so changed them as
+I moved them over. 
+Instead of different endpoints, I created one singular dashboard. The user must first log in to gain access, 
+authenticating against hashed credentials in SQLite. User IDs are saved in the Flask Session. Once logged in, the
+user is prompted to upload a csv file, which is loaded once into a pandas DataFrame and stored in the session cache. 
+The user is next taken to the dashboard, where they can select a category from the three buttons (Temperature trends,
+Rainfall Patterns, and Rain Prediction). Each button has a dropdown to select a city, which triggers a fetch to the
+Flask backend (`/api/analyze`) returning the graphs and summaries. The page updates in place.
 
-I used random forest because it is a powerful model that can handle the mixed-scale features with minimal preprocessing.
-Feature importances are easily extracted from the model, so you can see which variables actually matter for the 
-prediction. The model is also relatively fast to train, important for a web application. It's prediction speed is also
-adequate for the application, although other models exist that are faster.
+---
 
-A new "/predict" endpoint was added, serving a form where you can enter in weather values and pick a location. The 
-trained model runs the prediction and displays a results page. This page contains the prediction along with
-feature importances and other interesting metrics. 
+### The app has a layered structure:
+- **Data Layer**: `loader.py` handles CSV imports with async loading. `predictor.py` contains the scikit-learn model for
+predictions. Currently only Random Forest is supported, but the file is built to add additional models. Both utilize a 
+session cache so they only run once per session. Uploading a new CSV clears the cache to force a reload of the training.
+- **Business Logic**: `app.py` contains the Flask app and its routes. All the analysis functions are contained here as 
+well, a change from the previous structure to make things more simple and avoid circular imports. Each analysis category
+  (temperature, rainfall, prediction) has its own function to build visualizations based on a city's data. It converts 
+them to base64 strings so nothing has to be saved to a database or file system. They each have a text summary to 
+accompany the graphs.
+- **Presentation**: The dashboard is built with one HTML page `dashboard.html`. It uses JavaScript fetch calls to hit 
+all the Flask endpoints. This allows the page to be dynamic and swap the charts and summaries without needing to reload
+the page. 
+- **Authentication**: `auth.py` hashes passwords and establishes default users. The `@login_required` decorator protects
+the other endpoints in the app. 
+- **Database**: Not used much in the project, but SQLite is used to store credentials and query history.
 
 
 
 ### Endpoints
 
-- `/`: The home page of the application, which displays a welcome message and links to the different visualizations.
-- `/analyze`: This endpoint generates and displays a vizualization of data based on the user selection.
-- `/history`: This endpoint displays previous queries and their results. Basic logging info is stored using SQLite. The 
-graphs are also displayed here.
-- `'/predict`: Calling the GET method will display the prediction form, and POST runs the model and displays the result
-page.
+- `/login`: GET shows login form. POST authenticates user against hashed credentials from SQLite and starts a session.
+- `/logout`: Clears the session. Redirects user to the login page.
+- `/upload`: GET shows the CSV upload page. POST takes a CSV file, saves to the server, and asynchronously loads it once
+into a pandas DataFrame. Redirects to the dashboard.
+- `/dashboard`: A single page interactive dashboard. It has three buttons to access all analysis categories through the
+API endpoints below. 
+- `/api/analyze`: POST accpets a JSON body with category, city, and an optional input_data parameter (predictions only).
+It returns a JSON object with a base64 image and text summary. Supports temperature, rainfall, and prediction categories.
+- `/api/cities`: Returns a JSON of unique city names from the CSV. Populates the city dropdown menus.
+- `/api/prediction-defaults`: Accepts a JSON body with a city name and returns median values for each column. It's used
+to populate the prediction input, allowing users to easily test the model without needing to know the data structure.
 
 
 ---
